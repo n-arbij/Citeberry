@@ -51,6 +51,8 @@ class Client(database.Base):
 class Quote(database.Base):
     __tablename__ = "quotes"
     id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, ForeignKey("clients.id"))
+    client = relationship("Client")
     title = Column(String, index=True)
     description = Column(String)
     amount = Column(Float)
