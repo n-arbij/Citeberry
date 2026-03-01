@@ -1,7 +1,52 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+from app.config import settings
+# from app.database import create_tables
+# from app.routers import api_router
 
-@app.get("/")
-async def read_root():
-    return {"message": "Welcome to the Citeberry System!"}
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    # create_tables()
+    print(f"✅ Database tables ready")
+    yield
+    # Shutdown
+    print("👋 Shutting down...")
+
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    debug=settings.debug,
+    description="A Quotation and Invoicing API built with FastAPI",
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # update to your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# app.include_router(api_router, prefix="/api/v1")
+
+
+@app.get("/", tags=["Health"])
+def root():
+    return {
+        "app": settings.app_name,
+        "version": settings.app_version,
+        "docs": "/docs",
+    }
+
+
+@app.get("/health", tags=["Health"])
+def health_check():
+    return {"status": "healthy"}
