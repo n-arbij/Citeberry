@@ -3,14 +3,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-# from app.database import create_tables
-# from app.routers import api_router
+from app.database import create_tables
+from app.routers import api_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    # create_tables()
+    create_tables()
     print(f"✅ Database tables ready")
     yield
     # Shutdown
@@ -29,13 +29,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # update to your frontend URL
+    allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# app.include_router(api_router, prefix="/api/v1")
+app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/", tags=["Health"])
