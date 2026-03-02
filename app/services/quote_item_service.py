@@ -22,6 +22,11 @@ class QuoteItemService:
         result = self.db.execute(select(DBQuoteItem).where(DBQuoteItem.quote_id == quote_id))
         return result.scalars().all()
 
+    def get_all_items(self) -> list[DBQuoteItem]:
+        """Return every quote item in the database."""
+        result = self.db.execute(select(DBQuoteItem))
+        return result.scalars().all()
+
     def update_quote_item(self, item_id: int, description: str | None = None, quantity: int | None = None, unit_price: float | None = None) -> DBQuoteItem | None:
         item = self.get_quote_item(item_id)
         if not item:
