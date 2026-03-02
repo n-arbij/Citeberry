@@ -1,34 +1,33 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.dependencies import get_db
-from app.models import Client
+from sqlalchemy.orm import Session
+from app.database import Client as DBClient
 
 
 class ClientService:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: Session):
         self.db = db
 
-    async def create_client(self, client_name: str, enterprise_name: str, email: str, phone: str) -> Client:
-        new_client = Client(
+    def create_client(self, client_name: str, enterprise_name: str | None, email: str, phone: str | None) -> DBClient:
+        new_client = DBClient(
             client_name=client_name,
             enterprise_name=enterprise_name,
             email=email,
-            phone=phone
+            phone=phone,
         )
         self.db.add(new_client)
-        await self.db.commit()
-        await self.db.refresh(new_client)
+        self.db.commit()
+        self.db.refresh(new_client)
         return new_client
-    
-    async def get_client(self, client_id: int) -> Client:
-        return await self.db.get(Client, client_id)
-    
-    async def get_all_clients(self) -> list[Client]:
-        result = await self.db.execute(select(Client))
+
+    def get_client(self, client_id: int) -> DBClient | None:
+        return self.db.get(DBClient, client_id)
+
+    def get_all_clients(self) -> list[DBClient]:
+        result = self.db.execute(select(DBClient))
         return result.scalars().all()
-    
-    async def update_client(self, client_id: int, client_name: str = None, enterprise_name: str = None, email: str = None, phone: str = None) -> Client:
-        client = await self.get_client(client_id)
+
+    def update_client(self, client_id: int, client_name: str | None = None, enterprise_name: str | None = None, email: str | None = None, phone: str | None = None) -> DBClient | None:
+        client = self.get_client(client_id)
         if not client:
             return None
         if client_name is not None:
@@ -39,17 +38,17 @@ class ClientService:
             client.email = email
         if phone is not None:
             client.phone = phone
-        await self.db.commit()
-        await self.db.refresh(client)
+        self.db.commit()
+        self.db.refresh(client)
         return client
-    
-    async def delete_client(self, client_id: int) -> bool:
-        client = await self.get_client(client_id)
+
+    def delete_client(self, client_id: int) -> bool:
+        client = self.get_client(client_id)
         if not client:
             return False
-        await self.db.delete(client)
-        await self.db.commit()
+        self.db.delete(client)
+        self.db.commit()
         return True
-    
+
 
 __all__ = ["ClientService"]
