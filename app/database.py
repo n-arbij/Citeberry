@@ -90,3 +90,6 @@ class Invoice(database.Base):
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
+
+def create_tables():
+    database.Base.metadata.create_all(database.engine)
