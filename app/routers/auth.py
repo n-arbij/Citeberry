@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from app.dependencies import get_db
-from app.models.user import UserCreate, Token, User
+from app.models.user import UserCreate, Token, UserResponse
 from app.services.user_service import UserService
 from app.auth.jwt import verify_password, get_password_hash, create_access_token, decode_access_token
 
@@ -10,7 +10,7 @@ from app.auth.jwt import verify_password, get_password_hash, create_access_token
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
-@router.post("/register", response_model=User)
+@router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
     """Register a new user account."""
     service = UserService(db)

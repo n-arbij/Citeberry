@@ -1,38 +1,40 @@
 
 from typing import Generator, Any
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer
 from fastapi import Depends, HTTPException, Query
 from jose import JWTError
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.auth.jwt import decode_access_token
 
-from app.database import database
+from app.database import database, User
 from app.models.user import TokenData, UserInDB
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = HTTPBearer()
 
 def get_db() -> Generator[Session, None, None]:
 	yield from database.get_db()
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+def get_current_user(token = Depends(oauth2_scheme), db: Session = Depends(get_db)):
 	credentials_exception = HTTPException(
 		status_code=401,
 		detail="Could not validate credentials",
 		headers={"WWW-Authenticate": "Bearer"},
 	)
 	try:
-		payload = decode_access_token(token)
+		token_str = token.credentials if hasattr(token, 'credentials') else token
+		payload = decode_access_token(token_str)
 		username: str = payload.username
 		if username is None:
 			raise credentials_exception
 		token_data = TokenData(username=username)
 	except JWTError:
 		raise credentials_exception
-	user = db.query(UserInDB).filter(UserInDB.username == token_data.username).first()
+	user = db.execute(select(User).where(User.username == token_data.username)).scalar_one_or_none()
 	if user is None:
 		raise credentials_exception
-	return UserInDB(**user.__dict__)
+	return user
 
 class Pagination(BaseModel):
 	page: int = 1
