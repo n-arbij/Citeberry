@@ -37,6 +37,8 @@ class User(database.Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    organization = relationship("Organization", back_populates="users")
 
 
 class Client(database.Base):
@@ -46,11 +48,15 @@ class Client(database.Base):
     enterprise_name = Column(String)
     email = Column(String, unique=True, index=True)
     phone = Column(String)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    organization = relationship("Organization", back_populates="clients")
 
 
 class Quote(database.Base):
     __tablename__ = "quotes"
     id = Column(Integer, primary_key=True, index=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    organization = relationship("Organization", back_populates="quotes")
     client_id = Column(Integer, ForeignKey("clients.id"))
     client = relationship("Client")
     title = Column(String, index=True)
@@ -76,6 +82,8 @@ class QuoteItem(database.Base):
 class Notification(database.Base):
     __tablename__ = "notifications"
     id = Column(Integer, primary_key=True, index=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    organization = relationship("Organization", back_populates="notifications")
     user_id = Column(Integer)
     message = Column(String)
     created_at = Column(DateTime)
@@ -84,6 +92,8 @@ class Notification(database.Base):
 class Invoice(database.Base):
     __tablename__ = "invoices"
     id = Column(Integer, primary_key=True, index=True)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    organization = relationship("Organization", back_populates="invoices")
     title = Column(String, index=True)
     description = Column(String)
     amount = Column(Float)
@@ -91,5 +101,65 @@ class Invoice(database.Base):
     updated_at = Column(DateTime)
 
 
+
+import shortuuid
+
+
+class Organization(database.Base):
+    __tablename__ = "organizations"
+    # internal integer primary key, external short_id used everywhere else
+    id = Column(Integer, primary_key=True, index=True)
+    short_id = Column(String, unique=True, index=True, default=lambda: shortuuid.uuid())
+    name = Column(String, unique=True, index=True)
+    address = Column(String, nullable=True)
+    email = Column(String, unique=True, index=True, nullable=True)
+    users = relationship("User", back_populates="organization")
+    clients = relationship("Client", back_populates="organization")
+    quotes = relationship("Quote", back_populates="organization")
+    invoices = relationship("Invoice", back_populates="organization")
+    notifications = relationship("Notification", back_populates="organization")
+
+
+from sqlalchemy import text
+
+
 def create_tables():
     database.Base.metadata.create_all(database.engine)
+
+    with database.engine.connect() as conn:
+        result = conn.execute(text("PRAGMA table_info(users)"))
+        cols = [row[1] for row in result.fetchall()]
+        if "organization_id" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN organization_id INTEGER"))
+        
+        # clients table
+        result = conn.execute(text("PRAGMA table_info(clients)"))
+        cols = [row[1] for row in result.fetchall()]
+        if "organization_id" not in cols:
+            conn.execute(text("ALTER TABLE clients ADD COLUMN organization_id INTEGER"))
+        
+        # organization table additions
+        result = conn.execute(text("PRAGMA table_info(organizations)"))
+        org_cols = [row[1] for row in result.fetchall()]
+        if "short_id" not in org_cols:
+            conn.execute(text("ALTER TABLE organizations ADD COLUMN short_id VARCHAR"))
+        if "address" not in org_cols:
+            conn.execute(text("ALTER TABLE organizations ADD COLUMN address VARCHAR"))
+        if "email" not in org_cols:
+            conn.execute(text("ALTER TABLE organizations ADD COLUMN email VARCHAR"))
+        
+        # quote, invoice, notification organization refs
+        result = conn.execute(text("PRAGMA table_info(quotes)"))
+        quote_cols = [row[1] for row in result.fetchall()]
+        if "organization_id" not in quote_cols:
+            conn.execute(text("ALTER TABLE quotes ADD COLUMN organization_id INTEGER"))
+        
+        result = conn.execute(text("PRAGMA table_info(invoices)"))
+        inv_cols = [row[1] for row in result.fetchall()]
+        if "organization_id" not in inv_cols:
+            conn.execute(text("ALTER TABLE invoices ADD COLUMN organization_id INTEGER"))
+        
+        result = conn.execute(text("PRAGMA table_info(notifications)"))
+        notif_cols = [row[1] for row in result.fetchall()]
+        if "organization_id" not in notif_cols:
+            conn.execute(text("ALTER TABLE notifications ADD COLUMN organization_id INTEGER"))

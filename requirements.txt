@@ -5,3 +5,4 @@ passlib[argon2]
 python-jose[cryptography]
 pydantic
 pydantic-settings
+shortuuid
