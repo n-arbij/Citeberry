@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db
+from app.dependencies import get_db, get_current_user
 from app.services.user_service import UserService
 from app.models.user import User, UserCreate, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["Users"])
+
 
 @router.post("/", response_model=User)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -13,13 +14,15 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return service.create_user(
         username=user.username,
         email=user.email,
-        hashed_password=user.password,  # assume hashing handled upstream
+        hashed_password=user.password,
     )
+
 
 @router.get("/", response_model=list[User])
 def list_users(db: Session = Depends(get_db)):
     service = UserService(db)
     return service.get_all_users()
+
 
 @router.get("/{user_id}", response_model=User)
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -28,6 +31,7 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
+
 
 @router.put("/{user_id}", response_model=User)
 def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)):
@@ -42,6 +46,7 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
+
 @router.delete("/{user_id}")
 def delete_user(user_id: int, db: Session = Depends(get_db)):
     service = UserService(db)
@@ -49,3 +54,13 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     return {"ok": True}
+
+
+@router.get("/me", response_model=User)
+def read_current_user(current_user: User = Depends(get_current_user)):
+    return current_user
+
+
+@router.get("/protected", response_model=User)
+def protected_route(current_user: User = Depends(get_current_user)):
+    return current_user

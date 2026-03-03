@@ -1,11 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
 from app.services.quote_item_service import QuoteItemService
 from app.models.quote_item import QuoteItem, QuoteItemCreate, QuoteItemUpdate
-from app.database import QuoteItem as DBQuoteItem
 
 router = APIRouter(prefix="/quote-items", tags=["QuoteItems"])
 
