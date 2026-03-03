@@ -7,12 +7,13 @@ class ClientService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_client(self, client_name: str, enterprise_name: str | None, email: str, phone: str | None) -> DBClient:
+    def create_client(self, client_name: str, enterprise_name: str | None, email: str, phone: str | None, organization_id: int | None = None) -> DBClient:
         new_client = DBClient(
             client_name=client_name,
             enterprise_name=enterprise_name,
             email=email,
             phone=phone,
+            organization_id=organization_id,
         )
         self.db.add(new_client)
         self.db.commit()
@@ -26,7 +27,7 @@ class ClientService:
         result = self.db.execute(select(DBClient))
         return result.scalars().all()
 
-    def update_client(self, client_id: int, client_name: str | None = None, enterprise_name: str | None = None, email: str | None = None, phone: str | None = None) -> DBClient | None:
+    def update_client(self, client_id: int, client_name: str | None = None, enterprise_name: str | None = None, email: str | None = None, phone: str | None = None, organization_id: int | None = None) -> DBClient | None:
         client = self.get_client(client_id)
         if not client:
             return None
@@ -38,6 +39,8 @@ class ClientService:
             client.email = email
         if phone is not None:
             client.phone = phone
+        if organization_id is not None:
+            client.organization_id = organization_id
         self.db.commit()
         self.db.refresh(client)
         return client

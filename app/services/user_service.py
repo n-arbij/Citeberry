@@ -7,8 +7,13 @@ class UserService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_user(self, username: str, email: str, hashed_password: str) -> DBUser:
-        new_user = DBUser(username=username, email=email, hashed_password=hashed_password)
+    def create_user(self, username: str, email: str, hashed_password: str, organization_id: int | None = None) -> DBUser:
+        new_user = DBUser(
+            username=username,
+            email=email,
+            hashed_password=hashed_password,
+            organization_id=organization_id,
+        )
         self.db.add(new_user)
         self.db.commit()
         self.db.refresh(new_user)
@@ -25,7 +30,7 @@ class UserService:
         result = self.db.execute(select(DBUser))
         return result.scalars().all()
 
-    def update_user(self, user_id: int, username: str | None = None, email: str | None = None, hashed_password: str | None = None) -> DBUser | None:
+    def update_user(self, user_id: int, username: str | None = None, email: str | None = None, hashed_password: str | None = None, organization_id: int | None = None) -> DBUser | None:
         user = self.get_user(user_id)
         if not user:
             return None
@@ -35,6 +40,8 @@ class UserService:
             user.email = email
         if hashed_password is not None:
             user.hashed_password = hashed_password
+        if organization_id is not None:
+            user.organization_id = organization_id
         self.db.commit()
         self.db.refresh(user)
         return user
