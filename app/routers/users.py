@@ -11,10 +11,30 @@ router = APIRouter(prefix="/users", tags=["Users"])
 @router.post("/", response_model=UserResponse)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     service = UserService(db)
+    # organization handling same as auth.register
+    org_id: int | None = None
+    if user.organization_id is not None:
+        org_id = user.organization_id
+    elif user.organization_short_id is not None:
+        from app.services.organization_service import OrganizationService
+        org_service = OrganizationService(db)
+        org = org_service.get_by_short_id(user.organization_short_id)
+        if not org:
+            raise HTTPException(status_code=400, detail="Organization not found")
+        org_id = org.id
+    elif user.organization_name:
+        # create if needed
+        from app.services.organization_service import OrganizationService
+        org_service = OrganizationService(db)
+        org = org_service.get_by_name(user.organization_name)
+        if not org:
+            org = org_service.create_organization(user.organization_name)
+        org_id = org.id
     return service.create_user(
         username=user.username,
         email=user.email,
         hashed_password=user.password,
+        organization_id=org_id,
     )
 
 
