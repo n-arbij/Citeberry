@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import Optional
+from app.models.organization import OrganizationResponse
 
 class Client(BaseModel):
     id: int
@@ -6,18 +8,23 @@ class Client(BaseModel):
     enterprise_name: str | None = None
     email: str
     phone: str | None = None
+    organization: Optional[OrganizationResponse] = None
 
     class Config:
         orm_mode = True
 
-class ClientCreate(Client):
+class ClientCreate(BaseModel):
     client_name: str
     enterprise_name: str | None = None
     email: str
     phone: str | None = None
+    organization_id: int | None = None
+    organization_short_id: str | None = None
+    organization_name: str | None = None
 
-class ClientUpdate(Client):
+class ClientUpdate(BaseModel):
     client_name: str | None = None
     enterprise_name: str | None = None
     email: str | None = None
     phone: str | None = None
+    organization_id: int | None = None
