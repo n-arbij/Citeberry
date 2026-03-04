@@ -42,6 +42,25 @@ def require_admin(current_user: User = Depends(get_current_user)):
 		raise HTTPException(status_code=403, detail="Admin privileges required")
 	return current_user
 
+
+def log_activity(
+	db: Session,
+	user: User,
+	action: str,
+	resource_type: str | None = None,
+	resource_id: int | None = None,
+	details: str | None = None,
+):
+	from app.services.activity_log_service import ActivityLogService
+	ActivityLogService(db).log(
+		user_id=user.id,
+		action=action,
+		organization_id=user.organization_id,
+		resource_type=resource_type,
+		resource_id=resource_id,
+		details=details,
+	)
+
 class Pagination(BaseModel):
 	page: int = 1
 	per_page: int = 10
@@ -66,5 +85,5 @@ def paginate_query(query: Any, pagination: Pagination):
 	return query.offset(pagination.offset).limit(pagination.limit)
 
 
-__all__ = ["get_db", "get_current_user", "require_admin", "pagination_params", "Pagination", "paginate_query"]
+__all__ = ["get_db", "get_current_user", "require_admin", "log_activity", "pagination_params", "Pagination", "paginate_query"]
 
