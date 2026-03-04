@@ -8,6 +8,7 @@ class UserResponse(BaseModel):
     username: str
     email: str
     role: str = "user"
+    organization_id: Optional[int] = None
     organization: Optional[OrganizationResponse] = None
 
     class Config:

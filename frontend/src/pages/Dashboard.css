@@ -705,3 +705,135 @@
 .ds-loading { color: var(--text-muted); padding: 2rem 0; font-size: 0.9rem; }
 .ds-error-msg { color: #dc2626; padding: 1rem 0; font-size: 0.9rem; }
 .ds-empty { color: var(--text-muted); padding: 3rem 0; text-align: center; font-size: 0.9rem; }
+
+/* ── Form card (QuoteForm, etc.) ── */
+.ds-form-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 580px;
+}
+
+.ds-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 1.25rem;
+}
+
+.ds-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ds-field label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ds-field input,
+.ds-field select,
+.ds-field textarea {
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text);
+  background: #fff;
+  transition: border-color 0.2s;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ds-field input:focus,
+.ds-field select:focus,
+.ds-field textarea:focus {
+  border-color: var(--primary);
+}
+
+.ds-field textarea { resize: vertical; min-height: 80px; }
+
+.ds-field-error {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.ds-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+
+.ds-btn-ghost {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: 7px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+}
+.ds-btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+/* ── Section actions row ── */
+.ds-section-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Overview extras ── */
+.ds-stat-btn {
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  border: none;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+.ds-stat-btn:hover {
+  border-color: var(--accent, var(--primary));
+  box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+  transform: translateY(-1px);
+}
+
+.ds-overview-recent { margin-top: 2rem; }
+.ds-overview-recent h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.75rem;
+}
+.ds-view-all {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+.ds-view-all:hover { text-decoration: underline; }
+
+/* ── Empty state with CTA ── */
+.ds-empty-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.ds-empty-icon { font-size: 2.5rem; }
+.ds-empty-cta p { color: var(--text-muted); margin: 0; }
