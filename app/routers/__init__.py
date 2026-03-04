@@ -8,6 +8,7 @@ from .quote_items import router as quote_items_router
 from .invoices import router as invoices_router
 from .notifications import router as notifications_router
 from .organizations import router as organizations_router
+from .activity_logs import router as activity_logs_router
 
 from app.dependencies import get_current_user
 
@@ -25,5 +26,6 @@ api_router.include_router(quote_items_router)
 api_router.include_router(invoices_router)
 api_router.include_router(notifications_router)
 api_router.include_router(organizations_router)
+api_router.include_router(activity_logs_router)
 
 __all__ = ["api_router", "public_router"]
