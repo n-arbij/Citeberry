@@ -1,3 +1,5 @@
+import { apiGet, apiPost } from './api'
+
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
 function authHeaders() {
@@ -35,3 +37,13 @@ export async function requestToJoin(orgShortId) {
   }
   return res.json()
 }
+
+export const listJoinRequests = (orgShortId, status = 'pending') =>
+  apiGet(`/organizations/${orgShortId}/join-requests?status=${status}`)
+
+export const acceptJoinRequest = (orgShortId, requestId) =>
+  apiPost(`/organizations/${orgShortId}/join-requests/${requestId}/accept`)
+
+export const rejectJoinRequest = (orgShortId, requestId) =>
+  apiPost(`/organizations/${orgShortId}/join-requests/${requestId}/reject`)
+
