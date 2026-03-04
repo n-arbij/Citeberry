@@ -7,11 +7,12 @@ class UserService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_user(self, username: str, email: str, hashed_password: str, organization_id: int | None = None) -> DBUser:
+    def create_user(self, username: str, email: str, hashed_password: str, organization_id: int | None = None, role: str = "user") -> DBUser:
         new_user = DBUser(
             username=username,
             email=email,
             hashed_password=hashed_password,
+            role=role,
             organization_id=organization_id,
         )
         self.db.add(new_user)

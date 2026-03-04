@@ -37,6 +37,7 @@ class User(database.Base):
     username = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    role = Column(String, default="user")
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
     organization = relationship("Organization", back_populates="users")
 
@@ -105,6 +106,17 @@ class Invoice(database.Base):
 import shortuuid
 
 
+class OrgJoinRequest(database.Base):
+    __tablename__ = "org_join_requests"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    status = Column(String, default="pending")  # pending, accepted, rejected
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    user = relationship("User")
+    organization = relationship("Organization", back_populates="join_requests")
+
+
 class Organization(database.Base):
     __tablename__ = "organizations"
     # internal integer primary key, external short_id used everywhere else
@@ -118,6 +130,7 @@ class Organization(database.Base):
     quotes = relationship("Quote", back_populates="organization")
     invoices = relationship("Invoice", back_populates="organization")
     notifications = relationship("Notification", back_populates="organization")
+    join_requests = relationship("OrgJoinRequest", back_populates="organization")
 
 
 from sqlalchemy import text
@@ -131,6 +144,8 @@ def create_tables():
         cols = [row[1] for row in result.fetchall()]
         if "organization_id" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN organization_id INTEGER"))
+        if "role" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR DEFAULT 'user'"))
         
         # clients table
         result = conn.execute(text("PRAGMA table_info(clients)"))

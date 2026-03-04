@@ -36,6 +36,12 @@ def get_current_user(token = Depends(oauth2_scheme), db: Session = Depends(get_d
 		raise credentials_exception
 	return user
 
+
+def require_admin(current_user: User = Depends(get_current_user)):
+	if current_user.role != "admin":
+		raise HTTPException(status_code=403, detail="Admin privileges required")
+	return current_user
+
 class Pagination(BaseModel):
 	page: int = 1
 	per_page: int = 10
@@ -60,5 +66,5 @@ def paginate_query(query: Any, pagination: Pagination):
 	return query.offset(pagination.offset).limit(pagination.limit)
 
 
-__all__ = ["get_db", "pagination_params", "Pagination", "paginate_query"]
+__all__ = ["get_db", "get_current_user", "require_admin", "pagination_params", "Pagination", "paginate_query"]
 
