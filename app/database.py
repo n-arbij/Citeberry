@@ -106,6 +106,19 @@ class Invoice(database.Base):
 import shortuuid
 
 
+class ActivityLog(database.Base):
+    __tablename__ = "activity_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
+    action = Column(String, nullable=False)        # e.g. "create", "update", "delete", "login"
+    resource_type = Column(String, nullable=True)  # e.g. "invoice", "quote", "client"
+    resource_id = Column(Integer, nullable=True)
+    details = Column(String, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    user = relationship("User")
+
+
 class OrgJoinRequest(database.Base):
     __tablename__ = "org_join_requests"
     id = Column(Integer, primary_key=True, index=True)
