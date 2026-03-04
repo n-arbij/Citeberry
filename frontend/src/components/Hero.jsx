@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 export default function Hero() {
   return (
     <section className="hero dot-bg">
@@ -18,8 +20,8 @@ export default function Hero() {
         </p>
 
         <div className="hero-actions fade-up-3">
-          <button className="btn-hero btn-hero-primary">Start for free →</button>
-          <button className="btn-hero btn-hero-secondary">View demo</button>
+          <Link to="/register" className="btn-hero btn-hero-primary">Start for free →</Link>
+          <Link to="/login" className="btn-hero btn-hero-secondary">Sign in</Link>
         </div>
 
         {/* mock dashboard preview */}

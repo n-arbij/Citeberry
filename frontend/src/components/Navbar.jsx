@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom'
+
 export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="container navbar-inner">
-        <a href="#" className="nav-logo">
+        <Link to="/" className="nav-logo">
           cite<span>berry</span>
-        </a>
+        </Link>
 
         <ul className="nav-links">
           <li><a href="#features">Features</a></li>
@@ -14,8 +16,8 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-cta">
-          <button className="btn-ghost">Sign in</button>
-          <button className="btn-primary">Get started free</button>
+          <Link to="/login" className="btn-ghost">Sign in</Link>
+          <Link to="/register" className="btn-primary">Get started free</Link>
         </div>
       </div>
     </nav>
