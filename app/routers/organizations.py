@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db, get_current_user, require_admin
+from app.dependencies import get_db, get_current_user, require_admin, log_activity
 from app.services.organization_service import OrganizationService
 from app.models.organization import (
     OrganizationCreate,
@@ -28,6 +28,7 @@ def create_organization(
     current_user.role = "admin"
     current_user.organization_id = org.id
     db.commit()
+    log_activity(db, current_user, action="create", resource_type="organization", resource_id=org.id)
     return org
 
 
@@ -115,6 +116,7 @@ def accept_join_request(
     req = service.accept_join_request(request_id)
     if not req:
         raise HTTPException(status_code=404, detail="Join request not found or already processed")
+    log_activity(db, admin, action="accept_join_request", resource_type="org_join_request", resource_id=request_id, details=f"user_id={req.user_id}")
     return req
 
 
@@ -134,4 +136,5 @@ def reject_join_request(
     req = service.reject_join_request(request_id)
     if not req:
         raise HTTPException(status_code=404, detail="Join request not found or already processed")
+    log_activity(db, admin, action="reject_join_request", resource_type="org_join_request", resource_id=request_id, details=f"user_id={req.user_id}")
     return req
