@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 class Notification(BaseModel):
     id: int
     user_id: int
+    organization_id: Optional[int] = None
     message: str
     created_at: datetime
 

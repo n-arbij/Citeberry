@@ -1,14 +1,20 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.database import Notification as DBNotification
+from datetime import datetime, timezone
 
 
 class NotificationService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_notification(self, user_id: int, message: str, created_at=None) -> DBNotification:
-        new_notification = DBNotification(user_id=user_id, message=message, created_at=created_at)
+    def create_notification(self, user_id: int, message: str, organization_id: int | None = None, created_at=None) -> DBNotification:
+        new_notification = DBNotification(
+            user_id=user_id,
+            message=message,
+            organization_id=organization_id,
+            created_at=created_at or datetime.now(timezone.utc),
+        )
         self.db.add(new_notification)
         self.db.commit()
         self.db.refresh(new_notification)
@@ -16,6 +22,16 @@ class NotificationService:
 
     def get_notification(self, notification_id: int) -> DBNotification | None:
         return self.db.get(DBNotification, notification_id)
+
+    def get_all_notifications(self) -> list[DBNotification]:
+        result = self.db.execute(select(DBNotification))
+        return result.scalars().all()
+
+    def get_notifications_by_org(self, organization_id: int) -> list[DBNotification]:
+        result = self.db.execute(
+            select(DBNotification).where(DBNotification.organization_id == organization_id)
+        )
+        return result.scalars().all()
 
     def get_notifications_for_user(self, user_id: int) -> list[DBNotification]:
         result = self.db.execute(select(DBNotification).where(DBNotification.user_id == user_id))
