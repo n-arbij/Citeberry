@@ -7,8 +7,17 @@ class InvoiceService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_invoice(self, title: str, description: str, amount: float, created_at=None, updated_at=None) -> DBInvoice:
-        new_invoice = DBInvoice(title=title, description=description, amount=amount, created_at=created_at, updated_at=updated_at)
+    def create_invoice(self, title: str, description: str, amount: float, organization_id: int | None = None, created_at=None, updated_at=None) -> DBInvoice:
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        new_invoice = DBInvoice(
+            title=title,
+            description=description,
+            amount=amount,
+            organization_id=organization_id,
+            created_at=created_at or now,
+            updated_at=updated_at or now,
+        )
         self.db.add(new_invoice)
         self.db.commit()
         self.db.refresh(new_invoice)
@@ -16,6 +25,10 @@ class InvoiceService:
 
     def get_invoice(self, invoice_id: int) -> DBInvoice | None:
         return self.db.get(DBInvoice, invoice_id)
+
+    def get_invoices_by_org(self, organization_id: int) -> list[DBInvoice]:
+        result = self.db.execute(select(DBInvoice).where(DBInvoice.organization_id == organization_id))
+        return result.scalars().all()
 
     def get_all_invoices(self) -> list[DBInvoice]:
         result = self.db.execute(select(DBInvoice))

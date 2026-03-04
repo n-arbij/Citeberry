@@ -1,7 +1,9 @@
 from pydantic import BaseModel
+from typing import Optional
 
 class Invoice(BaseModel):
     id: int
+    organization_id: Optional[int] = None
     title: str
     description: str
     amount: float
@@ -15,7 +17,6 @@ class InvoiceCreate(BaseModel):
     title: str
     description: str
     amount: float
-
 
 class InvoiceUpdate(BaseModel):
     title: str | None = None

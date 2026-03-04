@@ -162,6 +162,16 @@ def create_tables():
             conn.execute(text("ALTER TABLE organizations ADD COLUMN address VARCHAR"))
         if "email" not in org_cols:
             conn.execute(text("ALTER TABLE organizations ADD COLUMN email VARCHAR"))
+
+        # backfill any organizations that have a NULL short_id (created before migration)
+        null_orgs = conn.execute(text("SELECT id FROM organizations WHERE short_id IS NULL")).fetchall()
+        for (org_id,) in null_orgs:
+            conn.execute(
+                text("UPDATE organizations SET short_id = :sid WHERE id = :id"),
+                {"sid": shortuuid.uuid(), "id": org_id},
+            )
+        if null_orgs:
+            conn.commit()
         
         # quote, invoice, notification organization refs
         result = conn.execute(text("PRAGMA table_info(quotes)"))
