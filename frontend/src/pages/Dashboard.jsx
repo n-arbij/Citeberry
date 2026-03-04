@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getMe } from '../api/users'
 import { listOrganizations, createOrganization, requestToJoin } from '../api/organizations'
+import AdminDashboard from './AdminDashboard'
+import UserDashboard from './UserDashboard'
 import './Dashboard.css'
 
 export default function Dashboard() {
@@ -63,7 +65,7 @@ export default function Dashboard() {
     setJoinError('')
     setJoinLoadingId(org.id)
     try {
-      await requestToJoin(org.short_id)
+      await requestToJoin(org.id)
       setSentRequest(org)
       setView('pending')
     } catch (err) {
@@ -105,16 +107,8 @@ export default function Dashboard() {
   }
 
   if (view === 'home') {
-    return (
-      <div className="dash-center">
-        <div className="dash-pending-card">
-          <div className="dash-pending-icon">🎉</div>
-          <h2>Welcome, {user?.username}!</h2>
-          <p>You're a member of <strong>{user?.organization?.name}</strong>.</p>
-          <p className="dash-sub">Full dashboard coming soon.</p>
-        </div>
-      </div>
-    )
+    if (user?.role === 'admin') return <AdminDashboard user={user} />
+    return <UserDashboard user={user} />
   }
 
   /* ── Roaming view ── */

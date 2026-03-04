@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../api/auth'
+import { getMe } from '../api/users'
 import './Auth.css'
 
 export default function Login() {
@@ -21,7 +22,15 @@ export default function Login() {
     try {
       const data = await api.login(form.username, form.password)
       localStorage.setItem('token', data.access_token)
-      navigate('/dashboard')
+
+      const user = await getMe()
+      if (!user.organization_id) {
+        navigate('/dashboard')           // no org → roaming
+      } else if (user.role === 'admin') {
+        navigate('/admin')               // admin dashboard
+      } else {
+        navigate('/user')                // regular user dashboard
+      }
     } catch (err) {
       setError(err.message)
     } finally {
