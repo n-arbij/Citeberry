@@ -1,6 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-from app.database import Organization as DBOrganization
+from app.database import Organization as DBOrganization, OrgJoinRequest, User as DBUser
 
 
 class OrganizationService:
@@ -50,6 +50,46 @@ class OrganizationService:
         self.db.delete(org)
         self.db.commit()
         return True
+
+    # --- Join request methods ---
+
+    def create_join_request(self, user_id: int, org_id: int) -> OrgJoinRequest:
+        req = OrgJoinRequest(user_id=user_id, organization_id=org_id, status="pending")
+        self.db.add(req)
+        self.db.commit()
+        self.db.refresh(req)
+        return req
+
+    def get_join_request(self, request_id: int) -> OrgJoinRequest | None:
+        return self.db.get(OrgJoinRequest, request_id)
+
+    def list_join_requests(self, org_id: int, status: str | None = None) -> list[OrgJoinRequest]:
+        q = select(OrgJoinRequest).where(OrgJoinRequest.organization_id == org_id)
+        if status:
+            q = q.where(OrgJoinRequest.status == status)
+        return self.db.execute(q).scalars().all()
+
+    def accept_join_request(self, request_id: int) -> OrgJoinRequest | None:
+        req = self.get_join_request(request_id)
+        if not req or req.status != "pending":
+            return None
+        req.status = "accepted"
+        # move the user into the organization
+        user = self.db.get(DBUser, req.user_id)
+        if user:
+            user.organization_id = req.organization_id
+        self.db.commit()
+        self.db.refresh(req)
+        return req
+
+    def reject_join_request(self, request_id: int) -> OrgJoinRequest | None:
+        req = self.get_join_request(request_id)
+        if not req or req.status != "pending":
+            return None
+        req.status = "rejected"
+        self.db.commit()
+        self.db.refresh(req)
+        return req
 
 
 __all__ = ["OrganizationService"]
