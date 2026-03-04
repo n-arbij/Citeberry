@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class Quote(BaseModel):
     id: int
     client_id: int
@@ -14,13 +15,14 @@ class Quote(BaseModel):
         orm_mode = True
 
 
-class QuoteCreate(Quote):
+class QuoteCreate(BaseModel):
     client_id: int
     title: str
     description: str | None = None
     amount: float
 
-class QuoteUpdate(Quote):
+
+class QuoteUpdate(BaseModel):
     client_id: int | None = None
     title: str | None = None
     description: str | None = None
