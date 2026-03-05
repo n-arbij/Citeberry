@@ -7,8 +7,8 @@ class QuoteService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_quote(self, client_id: int, title: str, description: str | None, amount: float, status: str | None = None) -> DBQuote:
-        new_quote = DBQuote(client_id=client_id, title=title, description=description, amount=amount, status=status)
+    def create_quote(self, client_id: int, title: str, description: str | None, amount: float, status: str | None = None, organization_id: int | None = None) -> DBQuote:
+        new_quote = DBQuote(client_id=client_id, title=title, description=description, amount=amount, status=status, organization_id=organization_id)
         self.db.add(new_quote)
         self.db.commit()
         self.db.refresh(new_quote)
@@ -19,6 +19,10 @@ class QuoteService:
 
     def get_all_quotes(self) -> list[DBQuote]:
         result = self.db.execute(select(DBQuote))
+        return result.scalars().all()
+
+    def get_quotes_by_org(self, organization_id: int) -> list[DBQuote]:
+        result = self.db.execute(select(DBQuote).where(DBQuote.organization_id == organization_id))
         return result.scalars().all()
 
     def get_quotes_for_client(self, client_id: int) -> list[DBQuote]:

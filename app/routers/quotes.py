@@ -20,13 +20,16 @@ def create_quote(
         title=payload.title,
         description=payload.description,
         amount=payload.amount,
+        organization_id=current_user.organization_id,
     )
     log_activity(db, current_user, action="create", resource_type="quote", resource_id=quote.id)
     return quote
 
 @router.get("/", response_model=list[Quote])
-def list_quotes(db: Session = Depends(get_db)):
+def list_quotes(db: Session = Depends(get_db), current_user: DBUser = Depends(get_current_user)):
     service = QuoteService(db)
+    if current_user.organization_id:
+        return service.get_quotes_by_org(current_user.organization_id)
     return service.get_all_quotes()
 
 @router.get("/{quote_id}", response_model=Quote)

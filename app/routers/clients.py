@@ -18,8 +18,8 @@ def create_client(
     service = ClientService(db)
     org_service = OrganizationService(db)
     
-    # resolve organization
-    org_id: int | None = None
+    # resolve organization — fall back to current user's org
+    org_id: int | None = current_user.organization_id
     if client.organization_id is not None:
         org = org_service.get_organization(client.organization_id)
         if not org:
@@ -47,8 +47,10 @@ def create_client(
     return new_client
 
 @router.get("/", response_model=list[Client])
-def list_clients(db: Session = Depends(get_db)):
+def list_clients(db: Session = Depends(get_db), current_user: DBUser = Depends(get_current_user)):
     service = ClientService(db)
+    if current_user.organization_id:
+        return service.get_clients_by_org(current_user.organization_id)
     return service.get_all_clients()
 
 @router.get("/{client_id}", response_model=Client)

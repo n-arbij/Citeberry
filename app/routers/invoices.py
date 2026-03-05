@@ -30,6 +30,8 @@ def list_invoices(
     current_user: DBUser = Depends(get_current_user),
 ):
     service = InvoiceService(db)
+    if current_user.organization_id:
+        return service.get_invoices_by_org(current_user.organization_id)
     return service.get_all_invoices()
 
 @router.get("/{invoice_id}", response_model=Invoice)

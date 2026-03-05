@@ -27,6 +27,10 @@ class ClientService:
         result = self.db.execute(select(DBClient))
         return result.scalars().all()
 
+    def get_clients_by_org(self, organization_id: int) -> list[DBClient]:
+        result = self.db.execute(select(DBClient).where(DBClient.organization_id == organization_id))
+        return result.scalars().all()
+
     def update_client(self, client_id: int, client_name: str | None = None, enterprise_name: str | None = None, email: str | None = None, phone: str | None = None, organization_id: int | None = None) -> DBClient | None:
         client = self.get_client(client_id)
         if not client:
