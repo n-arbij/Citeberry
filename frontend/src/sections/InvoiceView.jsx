@@ -1,9 +1,14 @@
 import { useState } from 'react'
-import { deleteInvoice } from '../api/invoices'
+import { deleteInvoice, updateInvoice } from '../api/invoices'
 import SectionShell from '../components/SectionShell'
+
+const STATUS_COLOR = { unpaid: '#f59e0b', paid: '#10b981', overdue: '#ef4444' }
+const STATUSES = ['unpaid', 'paid', 'overdue']
 
 export default function InvoiceView({ invoice, onBack, onDeleted }) {
   const [deleting, setDeleting] = useState(false)
+  const [status, setStatus] = useState(invoice.status || 'unpaid')
+  const [saving, setSaving] = useState(false)
 
   async function handleDelete() {
     if (!confirm(`Delete invoice "${invoice.title}"?`)) return
@@ -14,6 +19,18 @@ export default function InvoiceView({ invoice, onBack, onDeleted }) {
     } catch (err) {
       alert(err.message)
       setDeleting(false)
+    }
+  }
+
+  async function handleStatusChange(newStatus) {
+    setSaving(true)
+    try {
+      await updateInvoice(invoice.id, { status: newStatus })
+      setStatus(newStatus)
+    } catch (err) {
+      alert(err.message)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -36,6 +53,16 @@ export default function InvoiceView({ invoice, onBack, onDeleted }) {
 
             <span className="ds-meta-label">Amount</span>
             <span className="ds-amount ds-total-amount">${invoice.amount.toFixed(2)}</span>
+
+            <span className="ds-meta-label">Status</span>
+            <span>
+              <span className="ds-badge" style={{ '--bc': STATUS_COLOR[status] || '#6b7280', marginRight: '0.5rem' }}>{status}</span>
+              {STATUSES.filter(s => s !== status).map(s => (
+                <button key={s} className="ds-btn-secondary ds-btn-sm" style={{ marginRight: '0.3rem' }} onClick={() => handleStatusChange(s)} disabled={saving}>
+                  → {s}
+                </button>
+              ))}
+            </span>
 
             <span className="ds-meta-label">Description</span>
             <span>{invoice.description}</span>

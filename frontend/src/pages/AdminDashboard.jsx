@@ -8,9 +8,9 @@ import NotificationList from '../sections/NotificationList'
 import JoinRequests from '../sections/JoinRequests'
 import UserManagement from '../sections/UserManagement'
 import ActivityLogs from '../sections/ActivityLogs'
+import UserProfile from '../sections/UserProfile'
 
-const NAV = [
-  { id: 'overview',       label: 'Overview',        icon: '📊' },
+import NotifBadge from '../components/NotifBadge'
   { id: 'invoices',       label: 'Invoices',         icon: '🧾' },
   { id: 'quotes',         label: 'Quotes',           icon: '📝' },
   { id: 'clients',        label: 'Clients',          icon: '👥' },
@@ -35,6 +35,7 @@ export default function AdminDashboard({ user }) {
       case 'notifications':  return <NotificationList />
       case 'join-requests':  return <JoinRequests user={user} />
       case 'activity-logs':  return <ActivityLogs />
+      case 'profile':        return <UserProfile user={user} onUpdated={() => window.location.reload()} />
       default:               return <Overview user={user} onNavigate={setSection} />
     }
   }
@@ -53,11 +54,12 @@ export default function AdminDashboard({ user }) {
             >
               <span className="ds-nav-icon">{item.icon}</span>
               {item.label}
+              {item.id === 'notifications' && <NotifBadge />}
             </button>
           ))}
         </nav>
         <div className="ds-sidebar-footer">
-          <div className="ds-user-pill">
+          <div className="ds-user-pill ds-user-pill-link" onClick={() => setSection('profile')} title="View profile">
             <span className="ds-user-avatar">{user?.username?.[0]?.toUpperCase()}</span>
             <div>
               <div className="ds-user-name">{user?.username}</div>

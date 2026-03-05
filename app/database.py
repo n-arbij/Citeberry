@@ -93,6 +93,7 @@ class Notification(database.Base):
     user_id = Column(Integer)
     title = Column(String, nullable=True)
     message = Column(String)
+    is_read = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime)
 
 
@@ -104,6 +105,7 @@ class Invoice(database.Base):
     title = Column(String, index=True)
     description = Column(String)
     amount = Column(Float)
+    status = Column(String, nullable=False, default='unpaid')
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
 
@@ -220,3 +222,5 @@ def create_tables():
             conn.execute(text("ALTER TABLE notifications ADD COLUMN organization_id INTEGER"))
         if "title" not in notif_cols:
             conn.execute(text("ALTER TABLE notifications ADD COLUMN title VARCHAR"))
+        if "is_read" not in notif_cols:
+            conn.execute(text("ALTER TABLE notifications ADD COLUMN is_read INTEGER NOT NULL DEFAULT 0"))

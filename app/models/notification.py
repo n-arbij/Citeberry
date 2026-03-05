@@ -8,6 +8,7 @@ class Notification(BaseModel):
     organization_id: Optional[int] = None
     title: Optional[str] = None
     message: str
+    is_read: bool = False
     created_at: datetime
 
     class Config:

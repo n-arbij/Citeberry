@@ -51,6 +51,15 @@ def update_notification(notification_id: int, payload: NotificationUpdate, db: S
         raise HTTPException(status_code=404, detail="Notification not found")
     return note
 
+@router.put("/{notification_id}/read", response_model=Notification)
+def mark_notification_read(notification_id: int, db: Session = Depends(get_db)):
+    service = NotificationService(db)
+    note = service.mark_read(notification_id)
+    if not note:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return note
+
+
 @router.delete("/{notification_id}")
 def delete_notification(notification_id: int, db: Session = Depends(get_db)):
     service = NotificationService(db)

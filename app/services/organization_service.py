@@ -26,7 +26,7 @@ class OrganizationService:
         return result.scalars().first()
 
     def get_all_organizations(self) -> list[DBOrganization]:
-        result = self.db.execute(select(DBOrganization))
+        result = self.db.execute(select(DBOrganization).where(DBOrganization.is_active == True))
         return result.scalars().all()
 
     def update_organization(self, org_id: int, name: str | None = None, address: str | None = None, email: str | None = None) -> DBOrganization | None:
@@ -50,6 +50,15 @@ class OrganizationService:
         self.db.delete(org)
         self.db.commit()
         return True
+
+    def deactivate_organization(self, org_id: int) -> DBOrganization | None:
+        org = self.get_organization(org_id)
+        if not org:
+            return None
+        org.is_active = False
+        self.db.commit()
+        self.db.refresh(org)
+        return org
 
     # --- Join request methods ---
 

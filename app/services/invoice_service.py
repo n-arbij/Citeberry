@@ -7,13 +7,14 @@ class InvoiceService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_invoice(self, title: str, description: str, amount: float, organization_id: int | None = None, created_at=None, updated_at=None) -> DBInvoice:
+    def create_invoice(self, title: str, description: str, amount: float, organization_id: int | None = None, status: str = 'unpaid', created_at=None, updated_at=None) -> DBInvoice:
         from datetime import datetime, timezone
         now = datetime.now(timezone.utc)
         new_invoice = DBInvoice(
             title=title,
             description=description,
             amount=amount,
+            status=status,
             organization_id=organization_id,
             created_at=created_at or now,
             updated_at=updated_at or now,
@@ -34,7 +35,7 @@ class InvoiceService:
         result = self.db.execute(select(DBInvoice))
         return result.scalars().all()
 
-    def update_invoice(self, invoice_id: int, title: str | None = None, description: str | None = None, amount: float | None = None, updated_at=None) -> DBInvoice | None:
+    def update_invoice(self, invoice_id: int, title: str | None = None, description: str | None = None, amount: float | None = None, status: str | None = None, updated_at=None) -> DBInvoice | None:
         invoice = self.get_invoice(invoice_id)
         if not invoice:
             return None
@@ -44,6 +45,8 @@ class InvoiceService:
             invoice.description = description
         if amount is not None:
             invoice.amount = amount
+        if status is not None:
+            invoice.status = status
         if updated_at is not None:
             invoice.updated_at = updated_at
         self.db.commit()

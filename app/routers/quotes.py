@@ -20,6 +20,7 @@ def create_quote(
         title=payload.title,
         description=payload.description,
         amount=payload.amount,
+        status=payload.status,
         organization_id=current_user.organization_id,
     )
     log_activity(db, current_user, action="create", resource_type="quote", resource_id=quote.id)

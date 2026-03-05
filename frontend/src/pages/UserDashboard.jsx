@@ -5,6 +5,8 @@ import Invoices from '../sections/Invoices'
 import Quotes from '../sections/Quotes'
 import Clients from '../sections/Clients'
 import NotificationList from '../sections/NotificationList'
+import UserProfile from '../sections/UserProfile'
+import NotifBadge from '../components/NotifBadge'
 import './Dashboard.css'
 
 const NAV = [
@@ -27,6 +29,7 @@ export default function UserDashboard({ user }) {
       case 'quotes':        return <Quotes />
       case 'clients':       return <Clients />
       case 'notifications': return <NotificationList />
+      case 'profile':       return <UserProfile user={user} onUpdated={() => window.location.reload()} />
       default:              return <Overview user={user} onNavigate={setSection} />
     }
   }
@@ -45,11 +48,12 @@ export default function UserDashboard({ user }) {
             >
               <span className="ds-nav-icon">{item.icon}</span>
               {item.label}
+              {item.id === 'notifications' && <NotifBadge />}
             </button>
           ))}
         </nav>
         <div className="ds-sidebar-footer">
-          <div className="ds-user-pill">
+          <div className="ds-user-pill ds-user-pill-link" onClick={() => setSection('profile')} title="View profile">
             <span className="ds-user-avatar">{user?.username?.[0]?.toUpperCase()}</span>
             <div>
               <div className="ds-user-name">{user?.username}</div>

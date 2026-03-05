@@ -23,6 +23,7 @@ class QuoteCreate(BaseModel):
     title: str
     description: str | None = None
     amount: float
+    status: str | None = None
 
 
 class QuoteUpdate(BaseModel):

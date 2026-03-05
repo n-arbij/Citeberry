@@ -38,12 +38,23 @@ class NotificationService:
         result = self.db.execute(select(DBNotification).where(DBNotification.user_id == user_id))
         return result.scalars().all()
 
-    def update_notification(self, notification_id: int, message: str | None = None) -> DBNotification | None:
+    def update_notification(self, notification_id: int, message: str | None = None, title: str | None = None) -> DBNotification | None:
         n = self.get_notification(notification_id)
         if not n:
             return None
         if message is not None:
             n.message = message
+        if title is not None:
+            n.title = title
+        self.db.commit()
+        self.db.refresh(n)
+        return n
+
+    def mark_read(self, notification_id: int) -> DBNotification | None:
+        n = self.get_notification(notification_id)
+        if not n:
+            return None
+        n.is_read = True
         self.db.commit()
         self.db.refresh(n)
         return n
