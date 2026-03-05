@@ -17,6 +17,7 @@ class OrganizationResponse(OrganizationBase):
     id: str = Field(..., alias="short_id")
     address: Optional[str] = None
     email: Optional[str] = None
+    is_active: bool = True
 
     class Config:
         from_attributes = True

@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './api'
+import { apiGet, apiPost, apiPut } from './api'
 
 const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 
@@ -46,4 +46,7 @@ export const acceptJoinRequest = (orgShortId, requestId) =>
 
 export const rejectJoinRequest = (orgShortId, requestId) =>
   apiPost(`/organizations/${orgShortId}/join-requests/${requestId}/reject`)
+
+export const deactivateOrg = (orgIntId) =>
+  apiPut(`/organizations/${orgIntId}/deactivate`)
 

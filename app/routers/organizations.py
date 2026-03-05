@@ -65,6 +65,22 @@ def delete_organization(org_id: int, db: Session = Depends(get_db)):
     return {"ok": True}
 
 
+@router.put("/{org_id}/deactivate", response_model=OrganizationResponse)
+def deactivate_organization(
+    org_id: int,
+    db: Session = Depends(get_db),
+    admin: DBUser = Depends(require_admin),
+):
+    if admin.organization_id != org_id:
+        raise HTTPException(status_code=403, detail="You can only deactivate your own organization")
+    service = OrganizationService(db)
+    org = service.deactivate_organization(org_id)
+    if not org:
+        raise HTTPException(status_code=404, detail="Organization not found")
+    log_activity(db, admin, action="deactivate", resource_type="organization", resource_id=org_id)
+    return org
+
+
 # --- Join request endpoints ---
 
 @router.post("/{org_short_id}/join-requests", response_model=JoinRequestResponse, status_code=201)

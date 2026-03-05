@@ -64,6 +64,7 @@ export default function Register() {
 
       {/* right form panel */}
       <div className="auth-form-panel">
+        <Link to="/" className="auth-back-btn">← Back to home</Link>
         <div className="auth-form-card fade-up">
           <div className="auth-form-header">
             <h1>Create account</h1>
