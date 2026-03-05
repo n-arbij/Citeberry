@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getMe } from '../api/users'
 import Overview from '../sections/Overview'
 import Invoices from '../sections/Invoices'
 import Quotes from '../sections/Quotes'
@@ -17,11 +18,15 @@ const NAV = [
   { id: 'notifications', label: 'Notifications',  icon: '🔔' },
 ]
 
-export default function UserDashboard({ user }) {
+export default function UserDashboard({ user, setUser }) {
   const navigate = useNavigate()
   const [section, setSection] = useState('overview')
 
   function signOut() { localStorage.removeItem('token'); navigate('/login') }
+
+  async function handleProfileUpdated() {
+    try { const u = await getMe(); setUser(u) } catch (_) {}
+  }
 
   function renderSection() {
     switch (section) {
@@ -29,7 +34,7 @@ export default function UserDashboard({ user }) {
       case 'quotes':        return <Quotes />
       case 'clients':       return <Clients />
       case 'notifications': return <NotificationList />
-      case 'profile':       return <UserProfile user={user} onUpdated={() => window.location.reload()} />
+      case 'profile':       return <UserProfile user={user} onUpdated={handleProfileUpdated} />
       default:              return <Overview user={user} onNavigate={setSection} />
     }
   }

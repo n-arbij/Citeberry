@@ -107,8 +107,8 @@ export default function Dashboard() {
   }
 
   if (view === 'home') {
-    if (user?.role === 'admin') return <AdminDashboard user={user} />
-    return <UserDashboard user={user} />
+    if (user?.role === 'admin') return <AdminDashboard user={user} setUser={setUser} />
+    return <UserDashboard user={user} setUser={setUser} />
   }
 
   /* ── Roaming view ── */

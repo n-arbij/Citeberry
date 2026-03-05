@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getMe } from '../api/users'
 import Overview from '../sections/Overview'
 import Invoices from '../sections/Invoices'
 import Quotes from '../sections/Quotes'
@@ -20,11 +21,15 @@ import NotifBadge from '../components/NotifBadge'
   { id: 'activity-logs',  label: 'Activity Logs',    icon: '📋' },
 ]
 
-export default function AdminDashboard({ user }) {
+export default function AdminDashboard({ user, setUser }) {
   const navigate = useNavigate()
   const [section, setSection] = useState('overview')
 
   function signOut() { localStorage.removeItem('token'); navigate('/login') }
+
+  async function handleProfileUpdated() {
+    try { const u = await getMe(); setUser(u) } catch (_) {}
+  }
 
   function renderSection() {
     switch (section) {
@@ -35,7 +40,7 @@ export default function AdminDashboard({ user }) {
       case 'notifications':  return <NotificationList />
       case 'join-requests':  return <JoinRequests user={user} />
       case 'activity-logs':  return <ActivityLogs />
-      case 'profile':        return <UserProfile user={user} onUpdated={() => window.location.reload()} />
+      case 'profile':        return <UserProfile user={user} onUpdated={handleProfileUpdated} />
       default:               return <Overview user={user} onNavigate={setSection} />
     }
   }
