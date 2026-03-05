@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class Quote(BaseModel):
@@ -7,12 +8,12 @@ class Quote(BaseModel):
     title: str
     description: str | None = None
     amount: float
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
     status: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class QuoteCreate(BaseModel):

@@ -712,14 +712,27 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
-  max-width: 580px;
 }
 
 .ds-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.ds-form-col {
   display: flex;
   flex-direction: column;
   gap: 1.1rem;
-  margin-top: 1.25rem;
+}
+
+.ds-form-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .ds-field {
@@ -837,3 +850,21 @@
 }
 .ds-empty-icon { font-size: 2.5rem; }
 .ds-empty-cta p { color: var(--text-muted); margin: 0; }
+
+/* ── Quote items table inside form ── */
+.ds-items-table { margin-bottom: 0; }
+.ds-items-table input { width: 100%; box-sizing: border-box; }
+
+/* ── Total row ── */
+.ds-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 2px solid var(--border, #e5e7eb);
+  padding-top: 0.75rem;
+}
+.ds-total-amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
