@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Overview from '../sections/Overview'
-import InvoiceList from '../sections/InvoiceList'
+import Invoices from '../sections/Invoices'
 import Quotes from '../sections/Quotes'
-import ClientList from '../sections/ClientList'
+import Clients from '../sections/Clients'
 import NotificationList from '../sections/NotificationList'
 import './Dashboard.css'
 
@@ -23,9 +23,9 @@ export default function UserDashboard({ user }) {
 
   function renderSection() {
     switch (section) {
-      case 'invoices':      return <InvoiceList />
+      case 'invoices':      return <Invoices />
       case 'quotes':        return <Quotes />
-      case 'clients':       return <ClientList />
+      case 'clients':       return <Clients />
       case 'notifications': return <NotificationList />
       default:              return <Overview user={user} onNavigate={setSection} />
     }
