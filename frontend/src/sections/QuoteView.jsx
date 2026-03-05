@@ -76,7 +76,7 @@ export default function QuoteView({ quote, onBack, onEdit, onDeleted }) {
 
             <div className="ds-meta-grid">
               <span className="ds-meta-label">Client</span>
-              <span>#{quote.client_id}</span>
+              <span>{quote.client_name || `#${quote.client_id}`}</span>
 
               <span className="ds-meta-label">Amount</span>
               <span className="ds-amount">${quote.amount.toFixed(2)}</span>

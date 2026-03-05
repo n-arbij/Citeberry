@@ -6,6 +6,7 @@ from typing import Optional
 class ActivityLogResponse(BaseModel):
     id: int
     user_id: int
+    username: Optional[str] = None
     organization_id: Optional[int] = None
     action: str
     resource_type: Optional[str] = None

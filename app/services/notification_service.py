@@ -8,9 +8,10 @@ class NotificationService:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_notification(self, user_id: int, message: str, organization_id: int | None = None, created_at=None) -> DBNotification:
+    def create_notification(self, user_id: int, message: str, title: str | None = None, organization_id: int | None = None, created_at=None) -> DBNotification:
         new_notification = DBNotification(
             user_id=user_id,
+            title=title,
             message=message,
             organization_id=organization_id,
             created_at=created_at or datetime.now(timezone.utc),

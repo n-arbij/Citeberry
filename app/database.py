@@ -69,6 +69,10 @@ class Quote(database.Base):
     status = Column(String, default=QuoteStatus.DRAFT)
     quote_items = relationship("QuoteItem", back_populates="quote", cascade="all, delete-orphan")
 
+    @property
+    def client_name(self):
+        return self.client.client_name if self.client else None
+
 
 class QuoteItem(database.Base):
     __tablename__ = "quote_items"
@@ -87,6 +91,7 @@ class Notification(database.Base):
     organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=True)
     organization = relationship("Organization", back_populates="notifications")
     user_id = Column(Integer)
+    title = Column(String, nullable=True)
     message = Column(String)
     created_at = Column(DateTime)
 
@@ -119,6 +124,10 @@ class ActivityLog(database.Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     user = relationship("User")
 
+    @property
+    def username(self):
+        return self.user.username if self.user else None
+
 
 class OrgJoinRequest(database.Base):
     __tablename__ = "org_join_requests"
@@ -139,6 +148,7 @@ class Organization(database.Base):
     name = Column(String, unique=True, index=True)
     address = Column(String, nullable=True)
     email = Column(String, unique=True, index=True, nullable=True)
+    is_active = Column(Boolean, nullable=False, default=True)
     users = relationship("User", back_populates="organization")
     clients = relationship("Client", back_populates="organization")
     quotes = relationship("Quote", back_populates="organization")
@@ -160,6 +170,8 @@ def create_tables():
             conn.execute(text("ALTER TABLE users ADD COLUMN organization_id INTEGER"))
         if "role" not in cols:
             conn.execute(text("ALTER TABLE users ADD COLUMN role VARCHAR DEFAULT 'user'"))
+        if "is_locked" not in cols:
+            conn.execute(text("ALTER TABLE users ADD COLUMN is_locked INTEGER NOT NULL DEFAULT 0"))
         
         # clients table
         result = conn.execute(text("PRAGMA table_info(clients)"))
@@ -176,6 +188,8 @@ def create_tables():
             conn.execute(text("ALTER TABLE organizations ADD COLUMN address VARCHAR"))
         if "email" not in org_cols:
             conn.execute(text("ALTER TABLE organizations ADD COLUMN email VARCHAR"))
+        if "is_active" not in org_cols:
+            conn.execute(text("ALTER TABLE organizations ADD COLUMN is_active INTEGER NOT NULL DEFAULT 1"))
 
         # backfill any organizations that have a NULL short_id (created before migration)
         null_orgs = conn.execute(text("SELECT id FROM organizations WHERE short_id IS NULL")).fetchall()
@@ -197,8 +211,12 @@ def create_tables():
         inv_cols = [row[1] for row in result.fetchall()]
         if "organization_id" not in inv_cols:
             conn.execute(text("ALTER TABLE invoices ADD COLUMN organization_id INTEGER"))
-        
+        if "status" not in inv_cols:
+            conn.execute(text("ALTER TABLE invoices ADD COLUMN status VARCHAR NOT NULL DEFAULT 'unpaid'"))
+
         result = conn.execute(text("PRAGMA table_info(notifications)"))
         notif_cols = [row[1] for row in result.fetchall()]
         if "organization_id" not in notif_cols:
             conn.execute(text("ALTER TABLE notifications ADD COLUMN organization_id INTEGER"))
+        if "title" not in notif_cols:
+            conn.execute(text("ALTER TABLE notifications ADD COLUMN title VARCHAR"))

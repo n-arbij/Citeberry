@@ -23,7 +23,7 @@ export default function ActivityLogs() {
           {rows.map(l => (
             <tr key={l.id}>
               <td className="ds-id">{l.id}</td>
-              <td>#{l.user_id}</td>
+              <td>{l.username || `#${l.user_id}`}</td>
               <td><span className="ds-tag">{l.action}</span></td>
               <td className="ds-muted">{l.resource_type}{l.resource_id ? ` #${l.resource_id}` : ''}</td>
               <td className="ds-muted">{l.details || '—'}</td>

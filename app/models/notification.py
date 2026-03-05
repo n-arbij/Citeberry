@@ -6,6 +6,7 @@ class Notification(BaseModel):
     id: int
     user_id: int
     organization_id: Optional[int] = None
+    title: Optional[str] = None
     message: str
     created_at: datetime
 
@@ -14,8 +15,9 @@ class Notification(BaseModel):
 
 class NotificationCreate(BaseModel):
     user_id: int
+    title: Optional[str] = None
     message: str
 
 class NotificationUpdate(BaseModel):
-    user_id: int | None = None
+    title: str | None = None
     message: str | None = None

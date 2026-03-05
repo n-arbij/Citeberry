@@ -80,7 +80,7 @@ export default function QuoteList({ onView, onEdit, onCreate }) {
             <tr key={q.id}>
               <td className="ds-id">{q.id}</td>
               <td className="ds-link" onClick={() => onView(q)}>{q.title}</td>
-              <td className="ds-muted">#{q.client_id}</td>
+              <td className="ds-muted">{q.client_name || `#${q.client_id}`}</td>
               <td><span className="ds-amount">${q.amount.toFixed(2)}</span></td>
               <td>
                 <span className="ds-badge" style={{ '--bc': STATUS_COLOR[q.status] || '#6b7280' }}>

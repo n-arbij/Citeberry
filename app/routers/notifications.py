@@ -17,6 +17,7 @@ def create_notification(
     service = NotificationService(db)
     return service.create_notification(
         user_id=payload.user_id,
+        title=payload.title,
         message=payload.message,
         organization_id=current_user.organization_id,
     )

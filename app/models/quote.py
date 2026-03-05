@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 
 class Quote(BaseModel):
     id: int
     client_id: int
+    client_name: Optional[str] = None
     title: str
     description: str | None = None
     amount: float

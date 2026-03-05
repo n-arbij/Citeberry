@@ -19,7 +19,7 @@ export default function NotificationList() {
         {rows.map(n => (
           <li key={n.id} className="ds-notif-item">
             <div className="ds-notif-body">
-              <strong>{n.title}</strong>
+              {n.title && <strong>{n.title}</strong>}
               <p>{n.message}</p>
             </div>
             <span className="ds-muted ds-notif-date">{new Date(n.created_at).toLocaleDateString()}</span>
