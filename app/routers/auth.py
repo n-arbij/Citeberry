@@ -45,6 +45,12 @@ def login(username: str, password: str, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    if user.is_locked:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your account has been locked. Please contact an administrator.",
+        )
+
     log_activity(db, user, action="login", resource_type="user", resource_id=user.id)
 
     access_token_expires = timedelta(minutes=30)

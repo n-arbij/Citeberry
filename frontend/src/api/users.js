@@ -10,3 +10,9 @@ export async function getMe() {
   if (!res.ok) throw new Error('Unauthorized')
   return res.json()
 }
+
+import { apiGet, apiPut } from './api'
+
+export const listUsers    = ()           => apiGet('/users/')
+export const setUserRole  = (id, role)   => apiPut(`/users/${id}/role`,  { role })
+export const setUserLock  = (id, locked) => apiPut(`/users/${id}/lock`,  { is_locked: locked })

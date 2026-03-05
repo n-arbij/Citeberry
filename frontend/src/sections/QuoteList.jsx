@@ -90,7 +90,6 @@ export default function QuoteList({ onView, onEdit, onCreate }) {
               <td className="ds-muted">{new Date(q.created_at).toLocaleDateString()}</td>
               <td>
                 <div className="ds-action-row">
-                  <button className="ds-btn-view ds-btn-sm" onClick={() => onView(q)}>View</button>
                   {q.status === 'accepted' && (
                     <button
                       className="ds-btn-invoice ds-btn-sm"

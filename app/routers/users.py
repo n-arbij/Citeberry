@@ -1,11 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from app.dependencies import get_db, get_current_user
+from app.dependencies import get_db, get_current_user, require_admin, log_activity
 from app.services.user_service import UserService
 from app.models.user import User, UserCreate, UserUpdate, UserResponse
+from app.database import User as DBUser
 
 router = APIRouter(prefix="/users", tags=["Users"])
+
+
+class RolePayload(BaseModel):
+    role: str  # "user" | "admin"
+
+
+class LockPayload(BaseModel):
+    is_locked: bool
 
 
 @router.post("/", response_model=UserResponse)
@@ -39,8 +49,10 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[UserResponse])
-def list_users(db: Session = Depends(get_db)):
+def list_users(db: Session = Depends(get_db), current_user: DBUser = Depends(get_current_user)):
     service = UserService(db)
+    if current_user.organization_id:
+        return service.get_users_by_org(current_user.organization_id)
     return service.get_all_users()
 
 
@@ -79,3 +91,41 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     if not success:
         raise HTTPException(status_code=404, detail="User not found")
     return {"ok": True}
+
+
+@router.put("/{user_id}/role", response_model=UserResponse)
+def set_user_role(
+    user_id: int,
+    payload: RolePayload,
+    db: Session = Depends(get_db),
+    admin: DBUser = Depends(require_admin),
+):
+    if payload.role not in ("user", "admin"):
+        raise HTTPException(status_code=400, detail="Role must be 'user' or 'admin'")
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot change your own role")
+    service = UserService(db)
+    user = service.set_role(user_id, payload.role)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    log_activity(db, admin, action="set_role", resource_type="user", resource_id=user_id,
+                 details=f"role={payload.role}")
+    return user
+
+
+@router.put("/{user_id}/lock", response_model=UserResponse)
+def set_user_lock(
+    user_id: int,
+    payload: LockPayload,
+    db: Session = Depends(get_db),
+    admin: DBUser = Depends(require_admin),
+):
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot lock your own account")
+    service = UserService(db)
+    user = service.set_locked(user_id, payload.is_locked)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    action = "lock_user" if payload.is_locked else "unlock_user"
+    log_activity(db, admin, action=action, resource_type="user", resource_id=user_id)
+    return user

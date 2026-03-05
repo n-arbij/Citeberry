@@ -6,17 +6,18 @@ import Quotes from '../sections/Quotes'
 import Clients from '../sections/Clients'
 import NotificationList from '../sections/NotificationList'
 import JoinRequests from '../sections/JoinRequests'
+import UserManagement from '../sections/UserManagement'
 import ActivityLogs from '../sections/ActivityLogs'
-import './Dashboard.css'
 
 const NAV = [
-  { id: 'overview',       label: 'Overview',      icon: '📊' },
-  { id: 'invoices',       label: 'Invoices',       icon: '🧾' },
-  { id: 'quotes',         label: 'Quotes',         icon: '📝' },
-  { id: 'clients',        label: 'Clients',        icon: '👥' },
-  { id: 'notifications',  label: 'Notifications',  icon: '🔔' },
-  { id: 'join-requests',  label: 'Join Requests',  icon: '🔑' },
-  { id: 'activity-logs',  label: 'Activity Logs',  icon: '📋' },
+  { id: 'overview',       label: 'Overview',        icon: '📊' },
+  { id: 'invoices',       label: 'Invoices',         icon: '🧾' },
+  { id: 'quotes',         label: 'Quotes',           icon: '📝' },
+  { id: 'clients',        label: 'Clients',          icon: '👥' },
+  { id: 'users',          label: 'Users',            icon: '🛡️' },
+  { id: 'notifications',  label: 'Notifications',    icon: '🔔' },
+  { id: 'join-requests',  label: 'Join Requests',    icon: '🔑' },
+  { id: 'activity-logs',  label: 'Activity Logs',    icon: '📋' },
 ]
 
 export default function AdminDashboard({ user }) {
@@ -27,6 +28,7 @@ export default function AdminDashboard({ user }) {
 
   function renderSection() {
     switch (section) {
+      case 'users':          return <UserManagement currentUser={user} />
       case 'invoices':       return <Invoices />
       case 'quotes':         return <Quotes />
       case 'clients':        return <Clients />

@@ -8,11 +8,12 @@ class UserResponse(BaseModel):
     username: str
     email: str
     role: str = "user"
+    is_locked: bool = False
     organization_id: Optional[int] = None
     organization: Optional[OrganizationResponse] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class User(UserResponse):

@@ -31,6 +31,10 @@ class UserService:
         result = self.db.execute(select(DBUser))
         return result.scalars().all()
 
+    def get_users_by_org(self, organization_id: int) -> list[DBUser]:
+        result = self.db.execute(select(DBUser).where(DBUser.organization_id == organization_id))
+        return result.scalars().all()
+
     def update_user(self, user_id: int, username: str | None = None, email: str | None = None, hashed_password: str | None = None, organization_id: int | None = None) -> DBUser | None:
         user = self.get_user(user_id)
         if not user:
@@ -43,6 +47,24 @@ class UserService:
             user.hashed_password = hashed_password
         if organization_id is not None:
             user.organization_id = organization_id
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def set_role(self, user_id: int, role: str) -> DBUser | None:
+        user = self.get_user(user_id)
+        if not user:
+            return None
+        user.role = role
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
+    def set_locked(self, user_id: int, is_locked: bool) -> DBUser | None:
+        user = self.get_user(user_id)
+        if not user:
+            return None
+        user.is_locked = is_locked
         self.db.commit()
         self.db.refresh(user)
         return user

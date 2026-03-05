@@ -1001,3 +1001,41 @@
   font-weight: 500;
 }
 .ds-link:hover { text-decoration: underline; }
+
+/* ── User management ── */
+.ds-btn-elevate {
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1.5px solid #c4b5fd;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ds-btn-elevate:hover { background: #ddd6fe; }
+
+.ds-btn-demote {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1.5px solid #fcd34d;
+  border-radius: 6px;
+  padding: 0.3rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.ds-btn-demote:hover { background: #fde68a; }
+
+.ds-btn-elevate:disabled,
+.ds-btn-demote:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ds-self-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}

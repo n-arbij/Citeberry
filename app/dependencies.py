@@ -34,6 +34,11 @@ def get_current_user(token = Depends(oauth2_scheme), db: Session = Depends(get_d
 	user = db.execute(select(User).where(User.username == token_data.username)).scalar_one_or_none()
 	if user is None:
 		raise credentials_exception
+	if user.is_locked:
+		raise HTTPException(
+			status_code=403,
+			detail="Your account has been locked. Please contact an administrator.",
+		)
 	return user
 
 
