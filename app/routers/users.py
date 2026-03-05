@@ -6,6 +6,7 @@ from app.dependencies import get_db, get_current_user, require_admin, log_activi
 from app.services.user_service import UserService
 from app.models.user import User, UserCreate, UserUpdate, UserResponse
 from app.database import User as DBUser
+from app.auth.jwt import get_password_hash
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -16,6 +17,12 @@ class RolePayload(BaseModel):
 
 class LockPayload(BaseModel):
     is_locked: bool
+
+
+class SelfUpdatePayload(BaseModel):
+    username: str | None = None
+    email: str | None = None
+    password: str | None = None
 
 
 @router.post("/", response_model=UserResponse)
@@ -43,7 +50,7 @@ def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return service.create_user(
         username=user.username,
         email=user.email,
-        hashed_password=user.password,
+        hashed_password=get_password_hash(user.password),
         organization_id=org_id,
     )
 
@@ -61,6 +68,33 @@ def read_current_user(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@router.put("/me", response_model=UserResponse)
+def update_me(
+    payload: SelfUpdatePayload,
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user),
+):
+    service = UserService(db)
+    hashed = get_password_hash(payload.password) if payload.password else None
+    user = service.update_user(
+        current_user.id,
+        username=payload.username,
+        email=payload.email,
+        hashed_password=hashed,
+    )
+    return user
+
+
+@router.delete("/me")
+def delete_me(
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user),
+):
+    service = UserService(db)
+    service.delete_user(current_user.id)
+    return {"ok": True}
+
+
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     service = UserService(db)
@@ -71,13 +105,19 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{user_id}", response_model=UserResponse)
-def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)):
+def update_user(
+    user_id: int,
+    payload: UserUpdate,
+    db: Session = Depends(get_db),
+    admin: DBUser = Depends(require_admin),
+):
     service = UserService(db)
+    hashed = get_password_hash(payload.password) if payload.password else None
     user = service.update_user(
         user_id,
         username=payload.username,
         email=payload.email,
-        hashed_password=payload.password,
+        hashed_password=hashed,
     )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -85,7 +125,13 @@ def update_user(user_id: int, payload: UserUpdate, db: Session = Depends(get_db)
 
 
 @router.delete("/{user_id}")
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(
+    user_id: int,
+    db: Session = Depends(get_db),
+    admin: DBUser = Depends(require_admin),
+):
+    if user_id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account here")
     service = UserService(db)
     success = service.delete_user(user_id)
     if not success:

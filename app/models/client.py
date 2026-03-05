@@ -11,7 +11,7 @@ class Client(BaseModel):
     organization: Optional[OrganizationResponse] = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ClientCreate(BaseModel):
     client_name: str

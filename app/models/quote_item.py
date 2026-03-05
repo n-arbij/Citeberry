@@ -9,7 +9,7 @@ class QuoteItem(BaseModel):
     sub_total: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class QuoteItemCreate(QuoteItem):
     quote_id: int
