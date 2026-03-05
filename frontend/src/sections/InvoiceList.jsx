@@ -3,7 +3,7 @@ import { useFetch } from '../hooks/useFetch'
 import { listInvoices, deleteInvoice } from '../api/invoices'
 import SectionShell from '../components/SectionShell'
 
-export default function InvoiceList() {
+export default function InvoiceList({ onView }) {
   const { data, loading, error, load } = useFetch(useCallback(listInvoices, []))
   const rows = data || []
 
@@ -31,12 +31,15 @@ export default function InvoiceList() {
           {rows.map(i => (
             <tr key={i.id}>
               <td className="ds-id">{i.id}</td>
-              <td>{i.title}</td>
+              <td className="ds-link" onClick={() => onView && onView(i)}>{i.title}</td>
               <td className="ds-muted">{i.description}</td>
               <td><span className="ds-amount">${i.amount.toFixed(2)}</span></td>
               <td className="ds-muted">{new Date(i.created_at).toLocaleDateString()}</td>
               <td>
-                <button className="ds-btn-reject ds-btn-sm" onClick={() => handleDelete(i.id)}>Delete</button>
+                <div className="ds-action-row">
+                  <button className="ds-btn-view ds-btn-sm" onClick={() => onView && onView(i)}>View</button>
+                  <button className="ds-btn-reject ds-btn-sm" onClick={() => handleDelete(i.id)}>Delete</button>
+                </div>
               </td>
             </tr>
           ))}

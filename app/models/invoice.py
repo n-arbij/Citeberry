@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
 class Invoice(BaseModel):
     id: int
@@ -7,11 +8,11 @@ class Invoice(BaseModel):
     title: str
     description: str
     amount: float
-    created_at: str
-    updated_at: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class InvoiceCreate(BaseModel):
     title: str
