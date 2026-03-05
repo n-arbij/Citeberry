@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../api/auth'
 import { getMe } from '../api/users'
 import './Auth.css'
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const sessionExpired = searchParams.get('session') === 'expired'
+
   const [form, setForm] = useState({ username: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -59,12 +62,16 @@ export default function Login() {
 
       {/* right form panel */}
       <div className="auth-form-panel">
+        <Link to="/" className="auth-back-btn">← Back to home</Link>
         <div className="auth-form-card fade-up">
           <div className="auth-form-header">
             <h1>Sign in</h1>
             <p>Enter your credentials to continue</p>
           </div>
 
+          {sessionExpired && (
+            <div className="auth-info">⏱ Your session expired. Please sign in again.</div>
+          )}
           {error && <div className="auth-error">{error}</div>}
 
           <form onSubmit={handleSubmit} className="auth-form" noValidate>

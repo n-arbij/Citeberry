@@ -11,6 +11,11 @@ export async function apiFetch(path, options = {}) {
     },
   })
   if (!res.ok) {
+    if (res.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login?session=expired'
+      throw new Error('Session expired')
+    }
     const err = await res.json().catch(() => ({}))
     throw new Error(err.detail || `Request failed`)
   }
