@@ -9,13 +9,14 @@ import NotificationList from '../sections/NotificationList'
 import UserProfile from '../sections/UserProfile'
 import NotifBadge from '../components/NotifBadge'
 import './Dashboard.css'
+import { Dashboard, Receipt, FolderCheck, PeopleDiversity, Bell } from '@boxicons/react'
 
 const NAV = [
-  { id: 'overview',      label: 'Overview',      icon: '📊' },
-  { id: 'invoices',      label: 'Invoices',       icon: '🧾' },
-  { id: 'quotes',        label: 'Quotes',         icon: '📝' },
-  { id: 'clients',       label: 'Clients',        icon: '👥' },
-  { id: 'notifications', label: 'Notifications',  icon: '🔔' },
+  { id: 'overview',       label: 'Overview',         icon: <Dashboard /> },
+  { id: 'invoices',       label: 'Invoices',         icon: <Receipt /> },
+  { id: 'quotes',         label: 'Quotes',           icon: <FolderCheck /> },
+  { id: 'clients',        label: 'Clients',          icon: <PeopleDiversity /> },
+  { id: 'notifications',  label: 'Notifications',    icon: <Bell /> },
 ]
 
 export default function UserDashboard({ user, setUser }) {
@@ -42,8 +43,9 @@ export default function UserDashboard({ user, setUser }) {
   return (
     <div className="ds-app">
       <aside className="ds-sidebar">
-        <div className="ds-sidebar-logo">cite<span>berry</span></div>
+        <div className="ds-sidebar-logo">Cite<span>berry</span></div>
         <div className="ds-org-name">{user?.organization?.name || 'Organization'}</div>
+        <div className="ds-nav-section-title">Menu</div>
         <nav className="ds-nav">
           {NAV.map(item => (
             <button
@@ -57,12 +59,13 @@ export default function UserDashboard({ user, setUser }) {
             </button>
           ))}
         </nav>
+        <div className="ds-nav-section-title">Account</div>
         <div className="ds-sidebar-footer">
           <div className="ds-user-pill ds-user-pill-link" onClick={() => setSection('profile')} title="View profile">
             <span className="ds-user-avatar">{user?.username?.[0]?.toUpperCase()}</span>
             <div>
               <div className="ds-user-name">{user?.username}</div>
-              <div className="ds-user-role">Member</div>
+              <div className="ds-user-email">{user?.email}</div>
             </div>
           </div>
           <button className="ds-signout" onClick={signOut}>Sign out</button>
