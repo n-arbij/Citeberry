@@ -35,3 +35,9 @@ htmlcov/
 dist/
 build/
 *.egg
+
+node_modules/
+dist/
+build/
+*.log
+.DS_Store
