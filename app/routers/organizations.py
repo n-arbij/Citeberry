@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, get_current_user, require_admin, log_activity
 from app.services.organization_service import OrganizationService
+from app.services.notification_service import NotificationService
 from app.models.organization import (
     OrganizationCreate,
     OrganizationResponse,
@@ -133,6 +134,12 @@ def accept_join_request(
     if not req:
         raise HTTPException(status_code=404, detail="Join request not found or already processed")
     log_activity(db, admin, action="accept_join_request", resource_type="org_join_request", resource_id=request_id, details=f"user_id={req.user_id}")
+    NotificationService(db).create_notification(
+        user_id=req.user_id,
+        organization_id=org.id,
+        title="Join request accepted",
+        message=f"Your request to join {org.name} has been accepted. Welcome!",
+    )
     return req
 
 
@@ -153,4 +160,9 @@ def reject_join_request(
     if not req:
         raise HTTPException(status_code=404, detail="Join request not found or already processed")
     log_activity(db, admin, action="reject_join_request", resource_type="org_join_request", resource_id=request_id, details=f"user_id={req.user_id}")
+    NotificationService(db).create_notification(
+        user_id=req.user_id,
+        title="Join request declined",
+        message=f"Your request to join {org.name} has been declined.",
+    )
     return req
